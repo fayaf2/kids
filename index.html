@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Recognition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden; /* Ensure image doesn't overflow */
+            margin-bottom: 20px;
+        }
+
+        .card img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            margin: 0 auto;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>What is this?</h1>
+        <div class="card">
+            <img id="object-image" src="https://via.placeholder.com/300" alt="Object">
+        </div>
+        <button id="speak-button">Speak</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        const objects = [
+            {src: 'apple.jpg', answer: 'apple'},
+                {src: 'bat.jpg', answer: 'bat'},
+
+    {src: 'cat.jpg', answer: 'cat'},
+    {src: 'dog.jpg', answer: 'dog'},
+    {src: 'elephant.jpg', answer: 'elephant'},
+    {src: 'fish.jpg', answer: 'fish'},
+    {src: 'giraffe.jpg', answer: 'giraffe'},
+    {src: 'house.jpg', answer: 'house'},
+    {src: 'ice_cream.jpg', answer: 'ice cream'},
+    {src: 'jellyfish.jpg', answer: 'jellyfish'},
+    {src: 'kite.jpg', answer: 'kite'},
+    {src: 'lion.jpg', answer: 'lion'},
+    {src: 'monkey.jpg', answer: 'monkey'},
+    {src: 'nest.jpg', answer: 'nest'},
+    {src: 'orange.jpg', answer: 'orange'},
+    {src: 'penguin.jpg', answer: 'penguin'},
+    {src: 'queen.jpg', answer: 'queen'},
+    {src: 'rabbit.jpg', answer: 'rabbit'},
+    {src: 'sun.jpg', answer: 'sun'},
+    {src: 'tiger.jpg', answer: 'tiger'},
+    {src: 'umbrella.jpg', answer: 'umbrella'},
+    {src: 'violin.jpg', answer: 'violin'},
+    {src: 'whale.jpg', answer: 'whale'},
+    {src: 'xylophone.jpg', answer: 'xylophone'},
+    {src: 'yacht.jpg', answer: 'yacht'},
+    {src: 'zebra.jpg', answer: 'zebra'}
+            // Add more objects as needed
+        ];
+
+        let currentIndex = 0;
+
+        // Function to update the image source
+        function updateImage() {
+            document.getElementById('object-image').src = objects[currentIndex].src;
+        }
+
+        // Function to speak a given text
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(msg);
+        }
+
+        // Function to recognize speech
+        function recognizeSpeech() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                console.log('Voice recognition started. Try speaking into the microphone.');
+            };
+
+            recognition.onspeechend = function() {
+                recognition.stop();
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                document.getElementById('result').innerText = `You said: ${transcript}`;
+                if (transcript === objects[currentIndex].answer) {
+                    speak('That is right!');
+                    // Move to the next image after the correct response
+                    currentIndex = (currentIndex + 1) % objects.length;
+                    updateImage();
+                } else {
+                    speak('That is wrong! Please try again.');
+                }
+            };
+
+            recognition.onerror = function(event) {
+                speak('I did not understand your response. Please try again.');
+                console.log('Error occurred in recognition: ' + event.error);
+            };
+
+            recognition.start();
+        }
+
+        // Add event listener to the button
+        document.getElementById('speak-button').addEventListener('click', function() {
+            speak('What is this?');
+            setTimeout(recognizeSpeech, 1000);
+        });
+
+        // Initialize with the first image
+        updateImage();
+    </script>
+</body>
+</html>
